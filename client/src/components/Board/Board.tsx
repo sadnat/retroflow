@@ -199,7 +199,7 @@ export const Board: React.FC = () => {
     return (
       <>
       <PhaseTutorial phase={room.phase} />
-      <div className={`grouping-container ${room.phase === 'CONCLUSION' ? 'conclusion-layout' : ''}`}>
+      <div className={`grouping-container ${room.phase === 'GROUPING' ? 'with-sidebar' : ''} ${room.phase === 'CONCLUSION' ? 'conclusion-layout' : ''}`}>
         {room.phase === 'GROUPING' && (
           <div className="grouping-sidebar glass">
             <div className="sidebar-header">
@@ -507,17 +507,33 @@ export const Board: React.FC = () => {
 
         <style>{`
           .grouping-container {
-            display: grid;
+            display: flex;
             position: relative;
-            grid-template-columns: 320px 1fr;
             gap: 1.5rem;
             height: 100%;
-            padding: 1rem;
+            padding: 1.5rem;
             overflow: hidden;
+            box-sizing: border-box;
+          }
+          .grouping-container.with-sidebar {
+            display: grid;
+            grid-template-columns: 320px 1fr;
           }
           .grouping-container.conclusion-layout {
             height: auto;
             overflow: visible;
+          }
+          .grouping-main { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 1.5rem; 
+            height: 100%; 
+            overflow: hidden;
+            min-width: 0;
+            flex: 1;
+          }
+          .grouping-main.full-width {
+            width: 100%;
           }
           .grouping-main.conclusion-full { 
             padding: 2rem; 
@@ -552,14 +568,7 @@ export const Board: React.FC = () => {
           }
           .empty-sidebar { text-align: center; color: rgba(255, 255, 255, 0.2); margin-top: 2rem; font-style: italic; }
 
-          .grouping-main { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 1.5rem; 
-            height: 100%; 
-            overflow: hidden;
-            min-width: 0;
-          }
+
           .topic-creator {
             padding: 1rem; border-radius: 12px; display: flex; gap: 1rem;
             background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
@@ -573,13 +582,12 @@ export const Board: React.FC = () => {
 
           .topics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 1.5rem; 
             overflow-y: auto; 
             padding-bottom: 2rem;
             flex: 1;
             align-content: start;
-            padding-right: 0.5rem;
           }
           .topics-grid.conclusion-view {
             display: grid;
@@ -601,7 +609,8 @@ export const Board: React.FC = () => {
             display: flex;
             flex-direction: column;
             gap: 2rem;
-            max-width: 1000px;
+            max-width: 1200px;
+            width: 100%;
             margin: 0 auto;
             padding-bottom: 2rem;
           }
@@ -1126,14 +1135,13 @@ export const Board: React.FC = () => {
       <style>{`
         .board-grid {
           display: grid;
-          grid-template-columns: repeat(${room.columns.length}, minmax(300px, 1fr));
-          gap: 1rem;
+          grid-template-columns: repeat(${room.columns.length}, 1fr);
+          gap: 1.5rem;
           height: 100%;
-          padding: 1rem;
-          padding-right: 2rem;
+          padding: 1.5rem;
           overflow-x: auto;
           overflow-y: hidden;
-          min-width: min-content;
+          box-sizing: border-box;
         }
         .board-column {
           display: flex;
@@ -1141,7 +1149,7 @@ export const Board: React.FC = () => {
           border-radius: 12px;
           background: rgba(255, 255, 255, 0.02);
           height: 100%;
-          min-width: 0; /* Fix flex/grid sizing */
+          min-width: 280px;
           transition: background 0.2s;
         }
         .column-header {
