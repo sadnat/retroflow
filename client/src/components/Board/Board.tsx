@@ -269,17 +269,116 @@ export const Board: React.FC = () => {
             </div>
           )}
 
-          {room.phase === 'CONCLUSION' && (
-            <div className="conclusion-header glass">
-              <h2>{t.tutorials.CONCLUSION.title}</h2>
-              <p>{t.tutorials.CONCLUSION.description}</p>
+          {room.phase === 'CONCLUSION' ? (
+            /* CONCLUSION / SUMMARY VIEW */
+            <div className="summary-container">
+              {/* Stats Header */}
+              <div className="summary-stats">
+                <div className="stat-card">
+                  <div className="stat-number">{room.participants.length}</div>
+                  <div className="stat-label">Participants</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-number">{room.postits.length}</div>
+                  <div className="stat-label">Ideas shared</div>
+                </div>
+                <div className="stat-card">
+                  <div className="stat-number">{room.groups.length}</div>
+                  <div className="stat-label">Topics identified</div>
+                </div>
+                <div className="stat-card accent">
+                  <div className="stat-number">{room.actionItems.length}</div>
+                  <div className="stat-label">Action items</div>
+                </div>
+              </div>
+
+              {/* Action Items Summary */}
+              {room.actionItems.length > 0 && (
+                <div className="summary-section">
+                  <h3 className="section-title">Action Items</h3>
+                  <div className="actions-summary">
+                    {room.actionItems.map(a => {
+                      const topic = room.groups.find(g => g.id === a.groupId);
+                      return (
+                        <div key={a.id} className={`action-summary-row ${a.status === 'DONE' ? 'done' : ''}`}>
+                          <div className="action-checkbox">{a.status === 'DONE' ? '✓' : '○'}</div>
+                          <div className="action-details">
+                            <div className="action-content">{a.content}</div>
+                            {topic && <div className="action-topic">from: {topic.title}</div>}
+                          </div>
+                          <div className="action-assignee">
+                            <span className="assignee-avatar">{(a.ownerName || 'Team')[0].toUpperCase()}</span>
+                            <span className="assignee-name">{a.ownerName || t.actions.team}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Topics by Priority */}
+              <div className="summary-section">
+                <h3 className="section-title">Topics by Priority</h3>
+                <div className="topics-summary">
+                  {[...room.groups]
+                    .sort((a, b) => b.votes.length - a.votes.length)
+                    .map((group, index) => {
+                      const groupPostits = room.postits.filter(p => p.groupId === group.id);
+                      const groupActions = room.actionItems.filter(a => a.groupId === group.id);
+                      return (
+                        <div key={group.id} className="topic-summary-card">
+                          <div className="topic-rank">#{index + 1}</div>
+                          <div className="topic-main">
+                            <div className="topic-summary-header">
+                              <h4>{group.title}</h4>
+                              <div className="topic-badges">
+                                <span className="badge votes">{group.votes.length} votes</span>
+                                <span className="badge ideas">{groupPostits.length} ideas</span>
+                                {groupActions.length > 0 && (
+                                  <span className="badge actions">{groupActions.length} actions</span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="topic-ideas-preview">
+                              {groupPostits.slice(0, 3).map(p => (
+                                <div key={p.id} className="idea-chip" style={{ backgroundColor: p.color }}>
+                                  {p.content.length > 40 ? p.content.substring(0, 40) + '...' : p.content}
+                                </div>
+                              ))}
+                              {groupPostits.length > 3 && (
+                                <span className="more-ideas">+{groupPostits.length - 3} more</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+
+              {/* Participants */}
+              <div className="summary-section">
+                <h3 className="section-title">Participants</h3>
+                <div className="participants-summary">
+                  {room.participants.map(p => (
+                    <div key={p.id} className="participant-chip">
+                      <span className="participant-avatar">{p.name[0].toUpperCase()}</span>
+                      <span className="participant-name">{p.name}</span>
+                      {p.role === 'FACILITATOR' && <span className="facilitator-badge">Facilitator</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          )}
-          <div className={`topics-grid ${room.phase === 'CONCLUSION' ? 'conclusion-view' : ''}`}>
+          ) : (
+            /* OTHER THEMATIC PHASES (GROUPING, VOTING, ACTIONS) */
+            <>
+          <div className={`topics-grid`}>
             {room.groups.map((group: Group) => (
               <div
                 key={group.id}
-                className={`topic-card glass ${room.phase === 'CONCLUSION' ? 'conclusion-card' : ''}`}
+                className={`topic-card glass`}
                 onDragOver={handleDragOver}
                 onDrop={(e: React.DragEvent<HTMLDivElement>) => handleDropToGroup(e, group.id)}
               >
@@ -352,35 +451,30 @@ export const Board: React.FC = () => {
                   </div>
 
                   {/* Action Items Section */}
-                  {(room.phase === 'ACTIONS' || room.phase === 'CONCLUSION') && (
-                    <div className={`topic-actions ${room.phase === 'CONCLUSION' ? 'recap' : ''}`}>
-                      <h5>{room.phase === 'CONCLUSION' ? t.actions.decidedActions : t.actions.linkedActions}</h5>
+                  {room.phase === 'ACTIONS' && (
+                    <div className="topic-actions">
+                      <h5>{t.actions.linkedActions}</h5>
                       <div className="actions-list">
                         {room.actionItems
                           .filter(a => a.groupId === group.id)
                           .map(a => (
                             <div key={a.id} className={`action-row ${a.status === 'DONE' ? 'done' : ''}`}>
-                              {room.phase === 'ACTIONS' && (
-                                <input
-                                  type="checkbox"
-                                  checked={a.status === 'DONE'}
-                                  onChange={() => handleToggleAction(a)}
-                                />
-                              )}
+                              <input
+                                type="checkbox"
+                                checked={a.status === 'DONE'}
+                                onChange={() => handleToggleAction(a)}
+                              />
                               <span className="action-text">{a.content}</span>
-                              <span className="action-owner">@{a.ownerName || t.actions.team} {a.status === 'DONE' && room.phase === 'CONCLUSION' && '✅'}</span>
-                              {isFacilitator && room.phase === 'ACTIONS' && (
+                              <span className="action-owner">@{a.ownerName || t.actions.team}</span>
+                              {isFacilitator && (
                                 <button className="btn-del-action" onClick={() => handleDeleteAction(a.id)}>×</button>
                               )}
                             </div>
                           ))
                         }
-                        {room.phase === 'CONCLUSION' && room.actionItems.filter(a => a.groupId === group.id).length === 0 && (
-                          <div className="no-actions">{t.actions.noActions}</div>
-                        )}
                       </div>
 
-                      {isFacilitator && room.phase === 'ACTIONS' && (
+                      {isFacilitator && (
                         <div className="action-input-row">
                           <input
                             type="text"
@@ -407,6 +501,8 @@ export const Board: React.FC = () => {
               </div>
             ))}
           </div>
+            </>
+          )}
         </div>
 
         <style>{`
@@ -499,12 +595,281 @@ export const Board: React.FC = () => {
             border: none;
           }
           .no-actions { font-style: italic; opacity: 0.5; font-size: 0.9rem; padding: 0.5rem; }
-          .conclusion-header {
-            text-align: center; padding: 2rem; margin-bottom: 2rem; border-radius: 12px;
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+          
+          /* SUMMARY / CONCLUSION STYLES */
+          .summary-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-bottom: 2rem;
           }
-          .conclusion-header h2 { color: var(--accent-color); margin: 0 0 0.5rem 0; }
-          .conclusion-header p { opacity: 0.6; margin: 0; }
+          
+          .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+          }
+          .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+          }
+          .stat-card.accent {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+          }
+          .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+          }
+          .stat-label {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          }
+          
+          .summary-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+          }
+          .section-title {
+            margin: 0 0 1.5rem 0;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: var(--accent-color);
+            border-radius: 2px;
+          }
+          
+          /* Actions Summary */
+          .actions-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+          }
+          .action-summary-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-color);
+          }
+          .action-summary-row.done {
+            opacity: 0.6;
+            border-left-color: var(--retro-green);
+          }
+          .action-summary-row.done .action-content {
+            text-decoration: line-through;
+          }
+          .action-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+          }
+          .action-summary-row.done .action-checkbox {
+            background: var(--retro-green);
+            color: white;
+          }
+          .action-details {
+            flex: 1;
+          }
+          .action-content {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+          }
+          .action-topic {
+            font-size: 0.75rem;
+            opacity: 0.5;
+          }
+          .action-assignee {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+          }
+          .assignee-avatar {
+            width: 24px;
+            height: 24px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+          }
+          .assignee-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+          }
+          
+          /* Topics Summary */
+          .topics-summary {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+          }
+          .topic-summary-card {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+          }
+          .topic-rank {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            flex-shrink: 0;
+          }
+          .topic-main {
+            flex: 1;
+            min-width: 0;
+          }
+          .topic-summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+          }
+          .topic-summary-header h4 {
+            margin: 0;
+            font-size: 1.1rem;
+          }
+          .topic-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+          }
+          .badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+          }
+          .badge.votes {
+            background: rgba(47, 129, 247, 0.2);
+            color: var(--accent-color);
+          }
+          .badge.ideas {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+          }
+          .badge.actions {
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--retro-green);
+          }
+          .topic-ideas-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+          }
+          .idea-chip {
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: #000;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+          .more-ideas {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            font-style: italic;
+          }
+          
+          /* Participants Summary */
+          .participants-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+          }
+          .participant-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          .participant-avatar {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, var(--accent-color), #9c27b0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+          }
+          .participant-name {
+            font-size: 0.9rem;
+          }
+          .facilitator-badge {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.4rem;
+            background: var(--accent-color);
+            border-radius: 4px;
+            text-transform: uppercase;
+          }
+          
+          @media (max-width: 768px) {
+            .summary-stats {
+              grid-template-columns: repeat(2, 1fr);
+            }
+            .action-summary-row {
+              flex-wrap: wrap;
+            }
+            .action-assignee {
+              width: 100%;
+              justify-content: center;
+            }
+            .topic-summary-header {
+              flex-direction: column;
+            }
+          }
           .topic-card {
             border-radius: 12px; display: flex; flex-direction: column;
             background: rgba(255, 255, 255, 0.03); min-height: 250px;
