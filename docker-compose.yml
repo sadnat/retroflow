@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=retroflow
+      - POSTGRES_PASSWORD=retroflow_secret
+      - POSTGRES_DB=retroflow
+    networks:
+      - retroflow-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - retroflow-network
+
+  server:
+    build:
+      context: .
+      dockerfile: server.Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server:/app/server
+      - ./shared:/app/shared
+      - /app/server/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://retroflow:retroflow_secret@postgres:5432/retroflow
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - JWT_REFRESH_SECRET=your-super-secret-refresh-key-change-in-production
+    command: npm run dev
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - retroflow-network
+
+  client:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app/client
+      - ./shared:/app/shared
+      - /app/client/node_modules
+    environment:
+      - VITE_API_URL=https://retro.twibox.fr
+    command: npm run dev -- --host
+    networks:
+      - retroflow-network
+      - npm_default
+
+networks:
+  retroflow-network:
+    driver: bridge
+  npm_default:
+    external: true
+
+volumes:
+  redis-data:
+  postgres-data:

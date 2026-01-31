@@ -1,0 +1,49 @@
+:root {
+  --bg-color: #0d1117;
+  --panel-bg: rgba(22, 27, 34, 0.8);
+  --border-color: #30363d;
+  --text-primary: #e6edf3;
+  --text-secondary: #8b949e;
+  --accent-color: #2f81f7;
+  --accent-glow: rgba(47, 129, 247, 0.4);
+
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(12px);
+
+  /* Retro Colors */
+  --retro-green: #3fb950;
+  --retro-red: #f85149;
+  --retro-orange: #d29922;
+  --retro-blue: #58a6ff;
+  --retro-purple: #bc8cff;
+}
+
+body,
+html,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+.app-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.room-view {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}

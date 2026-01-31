@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoomStatus {
+  ACTIVE
+  CLOSED
+  ARCHIVED
+}
+
+enum ParticipantRole {
+  FACILITATOR
+  PARTICIPANT
+  OBSERVER
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String
+  passwordHash  String
+  avatar        String?
+  createdAt     DateTime  @default(now())
+  lastLoginAt   DateTime?
+
+  ownedRooms     Room[]            @relation("RoomOwner")
+  participations RoomParticipant[]
+  refreshTokens  RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Room {
+  id                String     @id @default(uuid())
+  name              String
+  template          String
+  status            RoomStatus @default(ACTIVE)
+  passwordHash      String?
+  maxPostitsPerUser Int?
+  phase             String     @default("SETUP")
+
+  ownerId String
+  owner   User   @relation("RoomOwner", fields: [ownerId], references: [id])
+
+  participants RoomParticipant[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  closedAt  DateTime?
+
+  @@map("rooms")
+}
+
+model RoomParticipant {
+  id String @id @default(uuid())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  roomId String
+  room   Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  guestName String?
+  role      ParticipantRole @default(PARTICIPANT)
+  isOnline  Boolean         @default(false)
+  joinedAt  DateTime        @default(now())
+
+  @@unique([userId, roomId])
+  @@map("room_participants")
+}
