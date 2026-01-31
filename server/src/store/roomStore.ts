@@ -1,4 +1,4 @@
-import { Room, Phase, Template, PostIt, Participant, Column, Group, ActionItem, ParticipantRole, RoomStatus } from '../../../shared/types';
+import { Room, Phase, Template, PostIt, Participant, Column, Group, ActionItem, ParticipantRole, RoomStatus, GroupStatus } from '../../../shared/types';
 import { v4 as uuidv4 } from 'uuid';
 import redis from './redisClient';
 
@@ -52,6 +52,7 @@ class RoomStore {
             }],
             postits: [],
             focusedPostItId: null,
+            focusedGroupId: null,
             actionItems: [],
             createdAt: Date.now()
         };
@@ -68,6 +69,13 @@ class RoomStore {
         const room = JSON.parse(data) as Room;
         
         // Ensure backward compatibility - add default values for new fields
+        if (!room.focusedGroupId) room.focusedGroupId = null;
+        
+        // Ensure groups have status field
+        room.groups = room.groups.map(g => ({
+            ...g,
+            status: g.status || 'PENDING'
+        }));
         if (!room.status) room.status = 'ACTIVE';
         room.participants = room.participants.map(p => ({
             ...p,
@@ -133,6 +141,7 @@ class RoomStore {
             })),
             postits: [],
             focusedPostItId: null,
+            focusedGroupId: null,
             actionItems: [],
             createdAt: Date.now()
         };
@@ -313,14 +322,98 @@ class RoomStore {
                     id: uuidv4(),
                     title: p.content,
                     color: p.color,
-                    votes: []
+                    votes: [],
+                    status: 'PENDING'
                 };
                 room.groups.push(group);
                 p.groupId = group.id;
             });
         }
 
+        // Reset group focus when leaving ACTIONS phase
+        if (room.phase === 'ACTIONS' && phase !== 'ACTIONS') {
+            room.focusedGroupId = null;
+        }
+
         room.phase = phase;
+        await this.saveRoom(room);
+        return true;
+    }
+
+    // Focus on the top voted group (used when entering ACTIONS phase)
+    async focusTopVotedGroup(roomId: string): Promise<boolean> {
+        const room = await this.getRoom(roomId);
+        if (!room || room.groups.length === 0) return false;
+
+        // Sort groups by votes (descending), then find first PENDING one
+        const sortedGroups = [...room.groups].sort((a, b) => 
+            (b.votes?.length || 0) - (a.votes?.length || 0)
+        );
+
+        const topGroup = sortedGroups.find(g => g.status !== 'DONE') || sortedGroups[0];
+        
+        // Set all groups to PENDING except the focused one
+        room.groups.forEach(g => {
+            if (g.id === topGroup.id) {
+                g.status = 'ACTIVE';
+            } else if (g.status === 'ACTIVE') {
+                g.status = 'PENDING';
+            }
+        });
+
+        room.focusedGroupId = topGroup.id;
+        await this.saveRoom(room);
+        return true;
+    }
+
+    // Focus on a specific group (facilitator action)
+    async focusGroup(roomId: string, groupId: string): Promise<boolean> {
+        const room = await this.getRoom(roomId);
+        if (!room) return false;
+
+        const group = room.groups.find(g => g.id === groupId);
+        if (!group) return false;
+
+        // Update statuses
+        room.groups.forEach(g => {
+            if (g.id === groupId) {
+                g.status = 'ACTIVE';
+            } else if (g.status === 'ACTIVE') {
+                g.status = 'PENDING';
+            }
+        });
+
+        room.focusedGroupId = groupId;
+        await this.saveRoom(room);
+        return true;
+    }
+
+    // Complete current group and move to next
+    async completeGroupAndFocusNext(roomId: string, groupId: string): Promise<boolean> {
+        const room = await this.getRoom(roomId);
+        if (!room) return false;
+
+        const group = room.groups.find(g => g.id === groupId);
+        if (!group) return false;
+
+        // Mark as done
+        group.status = 'DONE';
+
+        // Find next group to focus (sorted by votes, first PENDING)
+        const sortedGroups = [...room.groups].sort((a, b) => 
+            (b.votes?.length || 0) - (a.votes?.length || 0)
+        );
+
+        const nextGroup = sortedGroups.find(g => g.status === 'PENDING');
+        
+        if (nextGroup) {
+            nextGroup.status = 'ACTIVE';
+            room.focusedGroupId = nextGroup.id;
+        } else {
+            // All groups are done
+            room.focusedGroupId = null;
+        }
+
         await this.saveRoom(room);
         return true;
     }
@@ -475,7 +568,8 @@ class RoomStore {
             id: uuidv4(),
             title,
             color,
-            votes: []
+            votes: [],
+            status: 'PENDING'
         };
         room.groups.push(group);
         await this.saveRoom(room);

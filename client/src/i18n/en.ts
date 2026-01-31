@@ -83,7 +83,6 @@ export const en = {
         DISCUSSION: 'Discussion',
         GROUPING: 'Grouping',
         VOTING: 'Voting',
-        BRAINSTORM: 'Brainstorm',
         ACTIONS: 'Actions',
         CONCLUSION: 'Summary',
     },
@@ -139,24 +138,14 @@ export const en = {
                 'Vote for impact, not just agreement',
             ],
         },
-        BRAINSTORM: {
-            title: 'Generate Solutions',
-            description: 'Based on the voting results, brainstorm solutions and improvements for the top topics.',
-            tips: [
-                'Focus on the highest-voted topics',
-                'Think about concrete, actionable solutions',
-                'Build on others\' suggestions',
-                'No idea is bad during brainstorming',
-            ],
-        },
         ACTIONS: {
-            title: 'Define Action Items',
-            description: "Turn insights into actions! Create specific, assignable tasks with clear owners. These are your team's commitments.",
+            title: 'Discuss Topics & Define Actions',
+            description: "Work through topics one by one, starting with the most voted. Discuss each topic and define concrete action items before moving to the next.",
             tips: [
-                'Make actions specific and measurable',
-                'Assign an owner to each action',
-                'Keep actions achievable within the next sprint',
-                'Less is more - focus on high-impact items',
+                'Topics are ordered by vote count',
+                'Discuss the ideas related to each topic',
+                'Define specific, assignable actions',
+                'Click "Complete" to move to the next topic',
             ],
         },
         CONCLUSION: {
@@ -191,17 +180,26 @@ export const en = {
         resultsRevealed: 'Results revealed!',
         breakTie: 'Break tie',
         confirmTieBreak: 'This will reset votes for tied topics. Continue?',
+        ideasForTopic: 'Ideas for this topic',
     },
 
     // Actions
     actions: {
         title: 'Actions',
         decidedActions: 'Decided Actions',
-        linkedActions: 'Linked Actions',
-        newAction: 'New action...',
+        linkedActions: 'Actions',
+        newAction: 'Add an action item...',
         assignee: 'Assignee',
         team: 'Team',
         noActions: 'No actions for this topic',
+        add: 'Add',
+        completeAndNext: 'Complete & Next Topic',
+        completeTopic: 'Complete Topic',
+        upNext: 'Up Next',
+        completed: 'Completed',
+        allTopicsCompleted: 'All topics completed!',
+        totalActions: 'Total action items defined',
+        reviewTopics: 'Click a topic to review',
     },
 
     // Timer

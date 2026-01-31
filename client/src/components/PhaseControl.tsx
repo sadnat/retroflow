@@ -11,7 +11,7 @@ export const PhaseControl: React.FC = () => {
     if (!room || room.facilitatorId !== odlUserId) return null;
 
     const phases: Phase[] = [
-        'SETUP', 'IDEATION', 'GROUPING', 'VOTING', 'BRAINSTORM', 'ACTIONS', 'CONCLUSION'
+        'SETUP', 'IDEATION', 'DISCUSSION', 'GROUPING', 'VOTING', 'ACTIONS', 'CONCLUSION'
     ];
 
     const currentIdx = phases.indexOf(room.phase);

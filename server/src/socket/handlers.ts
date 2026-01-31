@@ -392,6 +392,11 @@ export const setupSocketHandlers = (io: Server) => {
                     // Ignore DB errors
                 }
 
+                // When entering ACTIONS phase, auto-focus on the top voted group
+                if (phase === 'ACTIONS') {
+                    await roomStore.focusTopVotedGroup(roomId);
+                }
+
                 io.to(roomId).emit('room:updated', await roomStore.getRoom(roomId));
                 console.log(`Phase changed to ${phase} in room ${roomId}`);
             }
@@ -543,6 +548,38 @@ export const setupSocketHandlers = (io: Server) => {
         socket.on('vote:reset_tie', async (data: { roomId: string }) => {
             if (await roomStore.resetTieVotes(data.roomId)) {
                 io.to(data.roomId).emit('room:updated', await roomStore.getRoom(data.roomId));
+            }
+        });
+
+        // Focus on a specific group (facilitator only, for ACTIONS phase)
+        socket.on('group:focus', async (data: { roomId: string, groupId: string, odlUserId: string }) => {
+            const { roomId, groupId, odlUserId } = data;
+
+            const participant = await roomStore.getParticipant(roomId, odlUserId);
+            if (!participant || participant.role !== 'FACILITATOR') {
+                socket.emit('error', { message: 'Only the facilitator can focus on groups' });
+                return;
+            }
+
+            if (await roomStore.focusGroup(roomId, groupId)) {
+                io.to(roomId).emit('room:updated', await roomStore.getRoom(roomId));
+                console.log(`Group ${groupId} focused in room ${roomId}`);
+            }
+        });
+
+        // Mark a group as complete and move to next (facilitator only)
+        socket.on('group:complete', async (data: { roomId: string, groupId: string, odlUserId: string }) => {
+            const { roomId, groupId, odlUserId } = data;
+
+            const participant = await roomStore.getParticipant(roomId, odlUserId);
+            if (!participant || participant.role !== 'FACILITATOR') {
+                socket.emit('error', { message: 'Only the facilitator can complete groups' });
+                return;
+            }
+
+            if (await roomStore.completeGroupAndFocusNext(roomId, groupId)) {
+                io.to(roomId).emit('room:updated', await roomStore.getRoom(roomId));
+                console.log(`Group ${groupId} completed in room ${roomId}`);
             }
         });
 

@@ -189,9 +189,26 @@ export const Board: React.FC = () => {
     socket?.emit('action:delete', { roomId: room.id, actionId });
   };
 
+  // Group focus/complete handlers (for ACTIONS phase)
+  const handleFocusGroup = (groupId: string) => {
+    if (!isFacilitator || !userId) return;
+    socket?.emit('group:focus', { roomId: room.id, groupId, odlUserId: userId });
+  };
+
+  const handleCompleteGroup = (groupId: string) => {
+    if (!isFacilitator || !userId) return;
+    socket?.emit('group:complete', { roomId: room.id, groupId, odlUserId: userId });
+  };
+
+  // Get sorted groups by votes for ACTIONS phase
+  const sortedGroups = [...room.groups].sort((a, b) => (b.votes?.length || 0) - (a.votes?.length || 0));
+  const focusedGroup = room.groups.find(g => g.id === room.focusedGroupId);
+  const pendingGroups = sortedGroups.filter(g => g.status === 'PENDING');
+  const doneGroups = sortedGroups.filter(g => g.status === 'DONE');
+
   // Check if we should use the Thematic grouping view
-  // Persistent for GROUPING, VOTING, BRAINSTORM, ACTIONS, CONCLUSION
-  const isThematicPhase = ['GROUPING', 'VOTING', 'BRAINSTORM', 'ACTIONS', 'CONCLUSION'].includes(room.phase);
+  // Persistent for GROUPING, VOTING, ACTIONS, CONCLUSION
+  const isThematicPhase = ['GROUPING', 'VOTING', 'ACTIONS', 'CONCLUSION'].includes(room.phase);
 
   if (isThematicPhase) {
     const unassignedPostIts = room.postits.filter(p => !p.groupId);
@@ -371,8 +388,170 @@ export const Board: React.FC = () => {
                 </div>
               </div>
             </div>
+          ) : room.phase === 'ACTIONS' ? (
+            /* ACTIONS PHASE - Full screen topic focus */
+            <div className="actions-phase-container">
+              {focusedGroup ? (
+                <>
+                  {/* Main focused topic area */}
+                  <div className="focused-topic-card">
+                    <div className="focused-topic-header">
+                      <div className="topic-info">
+                        <span className="topic-rank-badge">#{sortedGroups.findIndex(g => g.id === focusedGroup.id) + 1}</span>
+                        <h2>{focusedGroup.title}</h2>
+                        <span className="votes-badge">{focusedGroup.votes?.length || 0} votes</span>
+                      </div>
+                      <div className="topic-progress">
+                        <span className="done-count">{doneGroups.length} done</span>
+                        <span className="separator">/</span>
+                        <span className="total-count">{room.groups.length} topics</span>
+                      </div>
+                    </div>
+
+                    {/* Post-its for this topic */}
+                    <div className="focused-topic-postits">
+                      <h4>{t.board.ideasForTopic}</h4>
+                      <div className="postits-grid">
+                        {room.postits
+                          .filter(p => p.groupId === focusedGroup.id)
+                          .map(p => (
+                            <div 
+                              key={p.id} 
+                              className="postit-mini-card"
+                              style={{ backgroundColor: p.color }}
+                            >
+                              <div className="postit-text">{p.content}</div>
+                              <div className="postit-author">@{p.authorName}</div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+
+                    {/* Actions section */}
+                    <div className="focused-topic-actions">
+                      <h4>{t.actions.linkedActions}</h4>
+                      <div className="actions-list-focused">
+                        {room.actionItems
+                          .filter(a => a.groupId === focusedGroup.id)
+                          .map(a => (
+                            <div key={a.id} className={`action-item-row ${a.status === 'DONE' ? 'done' : ''}`}>
+                              <input
+                                type="checkbox"
+                                checked={a.status === 'DONE'}
+                                onChange={() => handleToggleAction(a)}
+                              />
+                              <span className="action-text">{a.content}</span>
+                              <span className="action-owner">@{a.ownerName || t.actions.team}</span>
+                              {isFacilitator && (
+                                <button className="btn-del" onClick={() => handleDeleteAction(a.id)}>×</button>
+                              )}
+                            </div>
+                          ))}
+                      </div>
+
+                      {/* Add action form */}
+                      <div className="add-action-form">
+                        <input
+                          type="text"
+                          placeholder={t.actions.newAction}
+                          value={newActionContent[focusedGroup.id] || ''}
+                          onChange={(e) => setNewActionContent({ ...newActionContent, [focusedGroup.id]: e.target.value })}
+                          onKeyDown={(e) => e.key === 'Enter' && handleAddAction(focusedGroup.id)}
+                        />
+                        <select
+                          value={newActionOwner[focusedGroup.id] || t.actions.team}
+                          onChange={(e) => setNewActionOwner({ ...newActionOwner, [focusedGroup.id]: e.target.value })}
+                        >
+                          <option value={t.actions.team}>{t.actions.team}</option>
+                          {room.participants.map(p => (
+                            <option key={p.id} value={p.name}>{p.name}</option>
+                          ))}
+                        </select>
+                        <button className="btn-add-action" onClick={() => handleAddAction(focusedGroup.id)}>
+                          {t.actions.add}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Navigation buttons */}
+                    {isFacilitator && (
+                      <div className="topic-navigation">
+                        <button 
+                          className="btn-complete-topic"
+                          onClick={() => handleCompleteGroup(focusedGroup.id)}
+                        >
+                          {pendingGroups.length > 0 ? t.actions.completeAndNext : t.actions.completeTopic}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Topics sidebar - remaining topics */}
+                  <div className="topics-sidebar">
+                    {pendingGroups.length > 0 && (
+                      <div className="sidebar-section">
+                        <h5>{t.actions.upNext}</h5>
+                        {pendingGroups.map((g, idx) => (
+                          <div 
+                            key={g.id} 
+                            className={`sidebar-topic-item ${isFacilitator ? 'clickable' : ''}`}
+                            onClick={() => isFacilitator && handleFocusGroup(g.id)}
+                          >
+                            <span className="topic-order">{idx + 1}</span>
+                            <span className="topic-name">{g.title}</span>
+                            <span className="topic-votes">{g.votes?.length || 0}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {doneGroups.length > 0 && (
+                      <div className="sidebar-section done-section">
+                        <h5>{t.actions.completed}</h5>
+                        {doneGroups.map(g => (
+                          <div 
+                            key={g.id} 
+                            className={`sidebar-topic-item done ${isFacilitator ? 'clickable' : ''}`}
+                            onClick={() => isFacilitator && handleFocusGroup(g.id)}
+                          >
+                            <span className="check-icon">✓</span>
+                            <span className="topic-name">{g.title}</span>
+                            <span className="action-count">{room.actionItems.filter(a => a.groupId === g.id).length}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                /* No focused group - show completion message or list */
+                <div className="all-topics-done">
+                  <div className="done-message">
+                    <span className="done-icon">✓</span>
+                    <h2>{t.actions.allTopicsCompleted}</h2>
+                    <p>{t.actions.totalActions}: {room.actionItems.length}</p>
+                  </div>
+                  {isFacilitator && doneGroups.length > 0 && (
+                    <div className="review-topics">
+                      <h4>{t.actions.reviewTopics}</h4>
+                      <div className="topics-review-grid">
+                        {doneGroups.map(g => (
+                          <div 
+                            key={g.id} 
+                            className="review-topic-card clickable"
+                            onClick={() => handleFocusGroup(g.id)}
+                          >
+                            <h5>{g.title}</h5>
+                            <span>{room.actionItems.filter(a => a.groupId === g.id).length} actions</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           ) : (
-            /* OTHER THEMATIC PHASES (GROUPING, VOTING, ACTIONS) */
+            /* OTHER THEMATIC PHASES (GROUPING, VOTING) */
             <>
           <div className={`topics-grid`}>
             {room.groups.map((group: Group) => (
@@ -862,6 +1041,433 @@ export const Board: React.FC = () => {
             background: var(--accent-color);
             border-radius: 4px;
             text-transform: uppercase;
+          }
+
+          /* ACTIONS PHASE - Full screen topic focus */
+          .actions-phase-container {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 1.5rem;
+            height: 100%;
+            overflow: hidden;
+          }
+
+          .focused-topic-card {
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            overflow: hidden;
+          }
+
+          .focused-topic-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, rgba(47, 129, 247, 0.15), rgba(47, 129, 247, 0.05));
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          }
+
+          .topic-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+          }
+
+          .topic-rank-badge {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+          }
+
+          .focused-topic-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+          }
+
+          .votes-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+          }
+
+          .topic-progress {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+          }
+
+          .done-count {
+            color: var(--retro-green);
+            font-weight: 600;
+          }
+
+          .separator {
+            opacity: 0.5;
+          }
+
+          .focused-topic-postits {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          }
+
+          .focused-topic-postits h4,
+          .focused-topic-actions h4 {
+            margin: 0 0 1rem 0;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+          }
+
+          .postits-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+          }
+
+          .postit-mini-card {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            color: #000;
+            font-size: 0.9rem;
+            font-weight: 500;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+            max-width: 250px;
+          }
+
+          .postit-mini-card .postit-text {
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+          }
+
+          .postit-mini-card .postit-author {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            font-style: italic;
+          }
+
+          .focused-topic-actions {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+          }
+
+          .actions-list-focused {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex: 1;
+            overflow-y: auto;
+          }
+
+          .action-item-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-color);
+          }
+
+          .action-item-row.done {
+            opacity: 0.6;
+            border-left-color: var(--retro-green);
+          }
+
+          .action-item-row.done .action-text {
+            text-decoration: line-through;
+          }
+
+          .action-item-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+          }
+
+          .action-item-row .action-text {
+            flex: 1;
+            font-size: 0.95rem;
+          }
+
+          .action-item-row .action-owner {
+            font-size: 0.8rem;
+            color: var(--accent-color);
+            font-weight: 600;
+          }
+
+          .action-item-row .btn-del {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0 0.3rem;
+          }
+
+          .action-item-row .btn-del:hover {
+            color: #f44336;
+          }
+
+          .add-action-form {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+          }
+
+          .add-action-form input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+          }
+
+          .add-action-form input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+          }
+
+          .add-action-form select {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            min-width: 120px;
+          }
+
+          .btn-add-action {
+            background: var(--accent-color);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+          }
+
+          .btn-add-action:hover {
+            background: #1a6dd4;
+          }
+
+          .topic-navigation {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+          }
+
+          .btn-complete-topic {
+            background: var(--retro-green);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+          }
+
+          .btn-complete-topic:hover {
+            background: #2ea043;
+            transform: translateY(-1px);
+          }
+
+          /* Topics sidebar */
+          .topics-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+          }
+
+          .sidebar-section h5 {
+            margin: 0 0 0.75rem 0;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+          }
+
+          .sidebar-topic-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid transparent;
+          }
+
+          .sidebar-topic-item.clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+          }
+
+          .sidebar-topic-item.clickable:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-left-color: var(--accent-color);
+          }
+
+          .sidebar-topic-item .topic-order {
+            background: rgba(255, 255, 255, 0.1);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex-shrink: 0;
+          }
+
+          .sidebar-topic-item .topic-name {
+            flex: 1;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .sidebar-topic-item .topic-votes {
+            font-size: 0.75rem;
+            color: var(--accent-color);
+            font-weight: 600;
+          }
+
+          .sidebar-topic-item.done {
+            opacity: 0.6;
+          }
+
+          .sidebar-topic-item .check-icon {
+            color: var(--retro-green);
+            font-weight: bold;
+          }
+
+          .sidebar-topic-item .action-count {
+            font-size: 0.75rem;
+            background: rgba(63, 185, 80, 0.2);
+            color: var(--retro-green);
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+          }
+
+          .done-section {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1rem;
+          }
+
+          /* All topics done state */
+          .all-topics-done {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            grid-column: 1 / -1;
+          }
+
+          .done-message {
+            margin-bottom: 2rem;
+          }
+
+          .done-message .done-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            background: var(--retro-green);
+            border-radius: 50%;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+          }
+
+          .done-message h2 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.5rem;
+          }
+
+          .done-message p {
+            margin: 0;
+            color: var(--text-secondary);
+          }
+
+          .review-topics h4 {
+            margin: 0 0 1rem 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+          }
+
+          .topics-review-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+          }
+
+          .review-topic-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            text-align: center;
+          }
+
+          .review-topic-card.clickable {
+            cursor: pointer;
+            transition: all 0.2s;
+          }
+
+          .review-topic-card.clickable:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-color);
+          }
+
+          .review-topic-card h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
+          }
+
+          .review-topic-card span {
+            font-size: 0.85rem;
+            color: var(--retro-green);
+          }
+
+          @media (max-width: 900px) {
+            .actions-phase-container {
+              grid-template-columns: 1fr;
+            }
+            .topics-sidebar {
+              display: none;
+            }
           }
           
           @media (max-width: 768px) {

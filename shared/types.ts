@@ -4,9 +4,10 @@ export type Phase =
   | 'DISCUSSION'
   | 'GROUPING'
   | 'VOTING'
-  | 'BRAINSTORM'
   | 'ACTIONS'
   | 'CONCLUSION';
+
+export type GroupStatus = 'PENDING' | 'ACTIVE' | 'DONE';
 
 export type Template = 'CLASSIC' | 'STARFISH' | 'CUSTOM';
 
@@ -88,6 +89,7 @@ export interface Group {
   title: string;
   color: string;
   votes: string[]; // User IDs (multiple entries allowed for multi-voting)
+  status: GroupStatus; // PENDING = not yet discussed, ACTIVE = currently being discussed, DONE = completed
 }
 
 export interface Room {
@@ -112,6 +114,7 @@ export interface Room {
   participants: Participant[];
   postits: PostIt[];
   focusedPostItId: string | null;
+  focusedGroupId: string | null; // Currently focused group in ACTIONS phase
   actionItems: ActionItem[];
   createdAt: number;
   closedAt?: number;
