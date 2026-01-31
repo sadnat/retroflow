@@ -121,7 +121,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Ignore logout errors
         }
 
+        // Clear room data as well
+        localStorage.removeItem('retroflow_room_id');
+        localStorage.removeItem('retroflow_user_id');
+        localStorage.removeItem('retroflow_user_name');
+
         clearAuth();
+        
+        // Redirect to home page
+        window.location.href = '/';
     }, [clearAuth]);
 
     // Refresh tokens

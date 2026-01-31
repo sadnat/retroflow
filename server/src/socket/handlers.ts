@@ -107,11 +107,6 @@ export const setupSocketHandlers = (io: Server) => {
                     return callback({ success: false, error: 'Room not found' });
                 }
 
-                // Check room status
-                if (room.status !== 'ACTIVE') {
-                    return callback({ success: false, error: 'This room is no longer active' });
-                }
-
                 // Check password if room is protected
                 if (room.hasPassword) {
                     // Get password hash from database

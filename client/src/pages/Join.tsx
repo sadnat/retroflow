@@ -24,10 +24,6 @@ export const JoinPage: React.FC<{ roomId: string }> = ({ roomId }) => {
             try {
                 const info = await checkRoom(roomId);
                 setRoomInfo(info);
-
-                if (info.status !== 'ACTIVE') {
-                    setError(t.room.roomClosed);
-                }
             } catch (err: any) {
                 setError(err || t.errors.roomNotFound);
             } finally {
@@ -105,7 +101,14 @@ export const JoinPage: React.FC<{ roomId: string }> = ({ roomId }) => {
             {roomInfo && (
                 <p className="room-name">{roomInfo.roomName}</p>
             )}
-            <p className="subtitle">Enter your name to participate</p>
+            
+            {roomInfo?.status !== 'ACTIVE' && (
+                <div className="closed-notice">
+                    This retrospective is closed. You can still view it in read-only mode.
+                </div>
+            )}
+            
+            <p className="subtitle">Enter your name to {roomInfo?.status === 'ACTIVE' ? 'participate' : 'view'}</p>
 
             {isAuthenticated && (
                 <div className="auth-info">
@@ -145,9 +148,9 @@ export const JoinPage: React.FC<{ roomId: string }> = ({ roomId }) => {
                 <button 
                     type="submit" 
                     className="btn-primary" 
-                    disabled={loading || roomInfo?.status !== 'ACTIVE'}
+                    disabled={loading}
                 >
-                    {loading ? t.app.loading : t.dashboard.join}
+                    {loading ? t.app.loading : (roomInfo?.status === 'ACTIVE' ? t.dashboard.join : 'View Retrospective')}
                 </button>
             </form>
 
@@ -168,6 +171,15 @@ export const JoinPage: React.FC<{ roomId: string }> = ({ roomId }) => {
           font-weight: 600;
           color: var(--accent-color);
           margin: 0 0 0.5rem;
+        }
+        .closed-notice {
+          padding: 0.75rem 1rem;
+          background: rgba(255, 152, 0, 0.1);
+          border: 1px solid rgba(255, 152, 0, 0.3);
+          border-radius: 8px;
+          font-size: 0.9rem;
+          color: #ff9800;
+          margin-bottom: 1rem;
         }
         .subtitle { 
           color: var(--text-secondary); 
