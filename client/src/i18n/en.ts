@@ -209,6 +209,14 @@ export const en = {
         timeUp: "Time's up!",
     },
 
+    // Export
+    export: {
+        exportPDF: 'Export PDF',
+        generatedOn: 'Generated on',
+        topicsPriority: 'Topics by Priority',
+        noActions: 'No actions defined',
+    },
+
     // My Retros
     myRetros: {
         title: 'My Retrospectives',

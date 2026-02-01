@@ -4,6 +4,7 @@ import { useSocket } from '../../context/SocketContext';
 import { Column, PostIt, Participant, Group, ActionItem } from '../../../../shared/types';
 import { t } from '../../i18n';
 import { PhaseTutorial } from '../PhaseTutorial';
+import { exportToPDF } from '../../services/pdfExport';
 
 export const Board: React.FC = () => {
   const { room, odlUserId: userId } = useRoom();
@@ -289,24 +290,48 @@ export const Board: React.FC = () => {
           {room.phase === 'CONCLUSION' ? (
             /* CONCLUSION / SUMMARY VIEW */
             <div className="summary-container">
-              {/* Stats Header */}
-              <div className="summary-stats">
-                <div className="stat-card">
-                  <div className="stat-number">{room.participants.length}</div>
-                  <div className="stat-label">Participants</div>
+              {/* Header with Export Button */}
+              <div className="summary-header-row">
+                <div className="summary-stats">
+                  <div className="stat-card">
+                    <div className="stat-number">{room.participants.length}</div>
+                    <div className="stat-label">Participants</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-number">{room.postits.length}</div>
+                    <div className="stat-label">Ideas shared</div>
+                  </div>
+                  <div className="stat-card">
+                    <div className="stat-number">{room.groups.length}</div>
+                    <div className="stat-label">Topics identified</div>
+                  </div>
+                  <div className="stat-card accent">
+                    <div className="stat-number">{room.actionItems.length}</div>
+                    <div className="stat-label">Action items</div>
+                  </div>
                 </div>
-                <div className="stat-card">
-                  <div className="stat-number">{room.postits.length}</div>
-                  <div className="stat-label">Ideas shared</div>
-                </div>
-                <div className="stat-card">
-                  <div className="stat-number">{room.groups.length}</div>
-                  <div className="stat-label">Topics identified</div>
-                </div>
-                <div className="stat-card accent">
-                  <div className="stat-number">{room.actionItems.length}</div>
-                  <div className="stat-label">Action items</div>
-                </div>
+                <button 
+                  className="btn-export-pdf"
+                  onClick={() => exportToPDF({
+                    room,
+                    translations: {
+                      title: room.name,
+                      participants: 'Participants',
+                      ideas: 'Ideas',
+                      topics: 'Topics',
+                      actionItems: 'Action Items',
+                      votes: 'votes',
+                      assignee: t.actions.assignee,
+                      team: t.actions.team,
+                      generatedOn: t.export.generatedOn,
+                      topicsPriority: t.export.topicsPriority,
+                      noActions: t.export.noActions,
+                    }
+                  })}
+                >
+                  <span className="pdf-icon">📄</span>
+                  {t.export.exportPDF}
+                </button>
               </div>
 
               {/* Action Items Summary */}
@@ -794,10 +819,19 @@ export const Board: React.FC = () => {
             padding-bottom: 2rem;
           }
           
+          .summary-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+          }
           .summary-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
+            flex: 1;
+            min-width: 400px;
           }
           .stat-card {
             background: rgba(255, 255, 255, 0.05);
@@ -821,6 +855,32 @@ export const Board: React.FC = () => {
             opacity: 0.7;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+          }
+          .btn-export-pdf {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            white-space: nowrap;
+          }
+          .btn-export-pdf:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+          }
+          .btn-export-pdf:active {
+            transform: translateY(0);
+          }
+          .pdf-icon {
+            font-size: 1.1rem;
           }
           
           .summary-section {
