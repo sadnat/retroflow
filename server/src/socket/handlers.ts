@@ -95,7 +95,7 @@ export const setupSocketHandlers = (io: Server) => {
                             participants: metadata.participants.map(p => ({
                                 id: p.id,
                                 userId: p.userId,
-                                guestName: p.guestName || p.user?.name,
+                                guestName: p.guestName || p.user?.name || null,
                                 role: p.role,
                             })),
                         });
@@ -168,7 +168,7 @@ export const setupSocketHandlers = (io: Server) => {
                             participants: metadata.participants.map(p => ({
                                 id: p.id,
                                 userId: p.userId,
-                                guestName: p.guestName || p.user?.name,
+                                guestName: p.guestName || p.user?.name || null,
                                 role: p.role,
                             })),
                         });
