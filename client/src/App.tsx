@@ -272,45 +272,52 @@ function AppContent() {
               height: 100vh;
               display: flex;
               flex-direction: column;
+              background: var(--bg-color);
             }
             .room-view.phase-conclusion .room-content {
               overflow-y: auto;
             }
             .room-header {
-              height: 60px;
+              height: 64px;
               padding: 0 2rem;
               display: flex;
               align-items: center;
               justify-content: space-between;
-              background: var(--panel-bg);
+              background: white;
               border-bottom: 1px solid var(--border-color);
-              backdrop-filter: var(--glass-blur);
+              box-shadow: var(--shadow-sm);
+              z-index: 10;
             }
             .room-info {
               display: flex;
               align-items: center;
               gap: 1rem;
             }
-            .room-info h2 { margin: 0; font-size: 1.2rem; }
+            .room-info h2 { margin: 0; font-size: 1.25rem; font-weight: 700; color: #111827; }
             .phase-badge, .status-badge {
-              padding: 0.2rem 0.6rem;
-              background: var(--accent-color);
-              border-radius: 4px;
-              font-size: 0.7rem;
-              font-weight: bold;
+              padding: 0.25rem 0.75rem;
+              background: #eff6ff;
+              color: var(--accent-color);
+              border: 1px solid #bfdbfe;
+              border-radius: 20px;
+              font-size: 0.75rem;
+              font-weight: 700;
               text-transform: uppercase;
+              letter-spacing: 0.5px;
             }
             .status-badge.closed {
-              background: rgba(158, 158, 158, 0.3);
-              color: #9e9e9e;
+              background: #f3f4f6;
+              color: #6b7280;
+              border-color: #d1d5db;
             }
             .observer-notice {
               padding: 0.2rem 0.6rem;
-              background: rgba(255, 152, 0, 0.2);
-              border: 1px solid rgba(255, 152, 0, 0.5);
+              background: #fff7ed;
+              border: 1px solid #fed7aa;
               border-radius: 4px;
               font-size: 0.75rem;
-              color: #ff9800;
+              color: #c2410c;
+              font-weight: 600;
             }
             .room-content {
               flex: 1;
@@ -322,43 +329,66 @@ function AppContent() {
             .room-controls {
               display: flex;
               align-items: center;
-              gap: 1rem;
+              gap: 0.8rem;
             }
             .btn-share, .btn-participants, .btn-delete, .btn-leave, .btn-close, .btn-reopen, .btn-logout {
-              background: rgba(255,255,255,0.1);
+              background: white;
               border: 1px solid var(--border-color);
-              color: white;
-              padding: 0.4rem 0.8rem;
-              border-radius: 6px;
+              color: var(--text-primary);
+              padding: 0.5rem 1rem;
+              border-radius: 8px;
               cursor: pointer;
-              font-size: 0.8rem;
+              font-size: 0.9rem;
+              font-weight: 500;
               display: flex;
               align-items: center;
-              gap: 0.4rem;
+              gap: 0.5rem;
+              transition: all 0.2s;
+              box-shadow: var(--shadow-sm);
             }
-            .btn-share:hover, .btn-participants:hover { background: rgba(255,255,255,0.2); }
+            .btn-share {
+                background: var(--accent-color);
+                color: white;
+                border: none;
+                font-weight: 600;
+            }
+            .btn-share:hover {
+                background: #1d4ed8;
+                transform: translateY(-1px);
+                box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+            }
+            .btn-participants:hover, .btn-logout:hover {
+                background: #f9fafb;
+                border-color: #d1d5db;
+            }
+            
             .btn-delete {
-              background: rgba(244, 67, 54, 0.2);
-              border-color: rgba(244, 67, 54, 0.5);
+              color: #ef4444;
+              border-color: #fecaca;
+              background: #fef2f2;
             }
-            .btn-delete:hover { background: rgba(244, 67, 54, 0.4); }
+            .btn-delete:hover { background: #fee2e2; border-color: #fca5a5; }
+            
             .btn-leave, .btn-close {
-              background: rgba(255, 152, 0, 0.2);
-              border-color: rgba(255, 152, 0, 0.5);
+              color: #f59e0b;
+              border-color: #fde68a;
+              background: #fffbeb;
             }
-            .btn-leave:hover, .btn-close:hover { background: rgba(255, 152, 0, 0.4); }
+            .btn-leave:hover, .btn-close:hover { background: #fef3c7; }
+            
             .btn-reopen {
-              background: rgba(76, 175, 80, 0.2);
-              border-color: rgba(76, 175, 80, 0.5);
+              color: var(--retro-green);
+              border-color: #bbf7d0;
+              background: #f0fdf4;
             }
-            .btn-reopen:hover { background: rgba(76, 175, 80, 0.4); }
+            .btn-reopen:hover { background: #dcfce7; }
             
             .online-indicator {
               width: 8px;
               height: 8px;
-              background: #4caf50;
+              background: var(--retro-green);
               border-radius: 50%;
-              box-shadow: 0 0 6px #4caf50;
+              box-shadow: 0 0 0 2px #d1fae5;
             }
             
             .participants-dropdown { position: relative; }
@@ -367,29 +397,35 @@ function AppContent() {
               top: 100%;
               right: 0;
               margin-top: 0.5rem;
-              background: var(--panel-bg);
+              background: white;
               border: 1px solid var(--border-color);
-              border-radius: 8px;
+              border-radius: 12px;
               min-width: 280px;
               max-height: 300px;
               overflow-y: auto;
               z-index: 100;
-              backdrop-filter: var(--glass-blur);
+              box-shadow: var(--shadow-lg);
             }
             .participants-header {
               padding: 0.75rem 1rem;
               border-bottom: 1px solid var(--border-color);
               font-weight: 600;
               font-size: 0.85rem;
+              background: #f9fafb;
+              color: var(--text-secondary);
             }
             .participant-item {
               display: flex;
               align-items: center;
-              gap: 0.5rem;
-              padding: 0.5rem 1rem;
-              font-size: 0.85rem;
+              gap: 0.8rem;
+              padding: 0.75rem 1rem;
+              font-size: 0.9rem;
+              color: #374151;
+              border-bottom: 1px solid #f3f4f6;
             }
-            .participant-item:hover { background: rgba(255,255,255,0.05); }
+            .participant-item:last-child { border-bottom: none; }
+            .participant-item:hover { background: #f9fafb; }
+            
             .status-dot {
               width: 8px;
               height: 8px;
@@ -397,31 +433,35 @@ function AppContent() {
               flex-shrink: 0;
             }
             .status-dot.online {
-              background: #4caf50;
-              box-shadow: 0 0 4px #4caf50;
+              background: var(--retro-green);
+              box-shadow: 0 0 0 2px #d1fae5;
             }
-            .status-dot.offline { background: #666; }
+            .status-dot.offline { background: #9ca3af; }
+            
             .participant-name {
               display: flex;
               align-items: center;
               gap: 0.5rem;
               flex: 1;
+              font-weight: 500;
             }
             .role-badge, .you-badge {
               font-size: 0.65rem;
-              padding: 0.1rem 0.4rem;
-              border-radius: 4px;
+              padding: 0.15rem 0.5rem;
+              border-radius: 10px;
               text-transform: uppercase;
+              font-weight: 700;
             }
-            .role-badge.facilitator { background: var(--accent-color); }
-            .role-badge.observer { background: rgba(255, 152, 0, 0.3); color: #ff9800; }
-            .you-badge { background: rgba(255,255,255,0.2); }
+            .role-badge.facilitator { background: #eff6ff; color: var(--accent-color); border: 1px solid #bfdbfe; }
+            .role-badge.observer { background: #fff7ed; color: #f97316; border: 1px solid #fed7aa; }
+            .you-badge { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+            
             .role-select {
-              background: rgba(255,255,255,0.1);
+              background: white;
               border: 1px solid var(--border-color);
-              color: white;
-              padding: 0.2rem 0.4rem;
-              border-radius: 4px;
+              color: #374151;
+              padding: 0.2rem 0.5rem;
+              border-radius: 6px;
               font-size: 0.75rem;
               cursor: pointer;
             }
@@ -429,37 +469,42 @@ function AppContent() {
             .user-menu {
               display: flex;
               align-items: center;
-              gap: 0.5rem;
+              gap: 1rem;
               padding-left: 1rem;
               border-left: 1px solid var(--border-color);
+              height: 32px;
             }
             .user-name {
-              font-size: 0.85rem;
-              color: var(--text-secondary);
+              font-size: 0.9rem;
+              font-weight: 600;
+              color: #374151;
             }
             
             .modal-overlay {
               position: fixed;
               inset: 0;
-              background: rgba(0,0,0,0.7);
+              background: rgba(0,0,0,0.5);
+              backdrop-filter: blur(2px);
               display: flex;
               align-items: center;
               justify-content: center;
               z-index: 1000;
             }
             .modal-content {
-              background: var(--panel-bg);
+              background: white;
               border: 1px solid var(--border-color);
-              border-radius: 12px;
-              padding: 1.5rem;
+              border-radius: 16px;
+              padding: 2rem;
               max-width: 400px;
               width: 90%;
+              box-shadow: var(--shadow-lg);
             }
-            .modal-content h3 { margin: 0 0 1rem; }
+            .modal-content h3 { margin: 0 0 1rem; font-size: 1.25rem; color: #111827; }
             .modal-content p {
               margin: 0 0 1.5rem;
-              color: var(--text-secondary);
-              font-size: 0.9rem;
+              color: #4b5563;
+              font-size: 1rem;
+              line-height: 1.5;
             }
             .modal-actions {
               display: flex;
@@ -467,23 +512,26 @@ function AppContent() {
               justify-content: flex-end;
             }
             .btn-cancel, .btn-confirm-delete {
-              padding: 0.5rem 1rem;
-              border-radius: 6px;
+              padding: 0.6rem 1.2rem;
+              border-radius: 8px;
               cursor: pointer;
-              font-size: 0.9rem;
+              font-size: 0.95rem;
+              font-weight: 500;
+              transition: all 0.2s;
             }
             .btn-cancel {
-              background: rgba(255,255,255,0.1);
-              border: 1px solid var(--border-color);
-              color: white;
+              background: white;
+              border: 1px solid #d1d5db;
+              color: #374151;
             }
             .btn-confirm-delete {
-              background: #f44336;
+              background: #ef4444;
               border: none;
               color: white;
+              font-weight: 600;
             }
-            .btn-cancel:hover { background: rgba(255,255,255,0.2); }
-            .btn-confirm-delete:hover { background: #d32f2f; }
+            .btn-cancel:hover { background: #f9fafb; border-color: #9ca3af; }
+            .btn-confirm-delete:hover { background: #dc2626; box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
           `}</style>
         </div>
       ) : urlRoomId ? (
