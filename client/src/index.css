@@ -1,22 +1,25 @@
 :root {
-  --bg-color: #0d1117;
-  --panel-bg: rgba(22, 27, 34, 0.8);
-  --border-color: #30363d;
-  --text-primary: #e6edf3;
-  --text-secondary: #8b949e;
-  --accent-color: #2f81f7;
-  --accent-glow: rgba(47, 129, 247, 0.4);
+  --bg-color: #f3f4f6;
+  --panel-bg: #ffffff;
+  --border-color: #e5e7eb;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --accent-color: #2563eb; /* Blue-600 */
+  --accent-glow: rgba(37, 99, 235, 0.2);
 
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.5);
   --glass-blur: blur(12px);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 
   /* Retro Colors */
-  --retro-green: #3fb950;
-  --retro-red: #f85149;
-  --retro-orange: #d29922;
-  --retro-blue: #58a6ff;
-  --retro-purple: #bc8cff;
+  --retro-green: #10b981;
+  --retro-red: #ef4444;
+  --retro-orange: #f59e0b;
+  --retro-blue: #3b82f6;
+  --retro-purple: #8b5cf6;
 }
 
 body,
@@ -35,7 +38,7 @@ html,
 /* Custom Scrollbar Styles */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--accent-color) rgba(255, 255, 255, 0.05);
+  scrollbar-color: #d1d5db transparent;
 }
 
 *::-webkit-scrollbar {
@@ -44,19 +47,18 @@ html,
 }
 
 *::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--accent-color);
+  background: #d1d5db;
   border-radius: 4px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: #4a9eff;
+  background: #9ca3af;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
@@ -70,43 +72,56 @@ select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-color: rgba(0, 0, 0, 0.3);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 12px;
   padding-right: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   color: var(--text-primary);
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
 }
 
 select:hover {
-  border-color: rgba(255, 255, 255, 0.3);
+  border-color: #9ca3af;
 }
 
 select:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px var(--accent-glow);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 select option {
-  background-color: #1a1f2e;
+  background-color: #ffffff;
   color: var(--text-primary);
   padding: 0.5rem;
 }
 
 /* Input focus styles */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  background-color: #ffffff;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
 input[type="text"]:focus,
 input[type="email"]:focus,
 input[type="password"]:focus,
 textarea:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 2px var(--accent-glow);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 
 .app-container {

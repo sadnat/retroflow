@@ -67,11 +67,11 @@ export const PhaseControl: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 1.2rem;
-          background: rgba(255, 255, 255, 0.05);
-          padding: 0.4rem 1rem;
+          background: white;
+          padding: 0.5rem 1.2rem;
           border-radius: 30px;
           border: 1px solid var(--border-color);
-          backdrop-filter: blur(8px);
+          box-shadow: var(--shadow-sm);
         }
         .current-phase-info {
           display: flex;
@@ -82,15 +82,15 @@ export const PhaseControl: React.FC = () => {
         }
         .phase-label {
           font-size: 0.7rem;
-          font-weight: bold;
+          font-weight: 800;
           text-transform: uppercase;
           color: var(--accent-color);
           letter-spacing: 0.5px;
         }
         .phase-steps { display: flex; gap: 0.3rem; }
-        .step-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-secondary); opacity: 0.2; }
+        .step-dot { width: 6px; height: 6px; border-radius: 50%; background: #d1d5db; }
         .step-dot.active { background: var(--accent-color); opacity: 0.6; }
-        .step-dot.current { opacity: 1; transform: scale(1.2); background: #fff; }
+        .step-dot.current { opacity: 1; transform: scale(1.2); background: var(--accent-color); }
         
         button {
           background: transparent;
@@ -99,29 +99,35 @@ export const PhaseControl: React.FC = () => {
           cursor: pointer;
           font-size: 0.9rem;
           transition: all 0.2s;
+          display: flex; align-items: center; justify-content: center;
+          width: 24px; height: 24px; border-radius: 50%;
         }
-        button:disabled { opacity: 0.2; cursor: not-allowed; }
+        button:hover:not(:disabled) { background: #f3f4f6; color: var(--accent-color); }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
         
         .btn-next {
           font-weight: 600;
           color: var(--text-primary);
           padding: 0.2rem 0.6rem;
-          border-radius: 4px;
+          border-radius: 12px;
+          width: auto; height: auto;
         }
-        .btn-next:hover:not(:disabled) { color: var(--accent-color); }
+        .btn-next:hover:not(:disabled) { color: var(--accent-color); background: #eff6ff; }
         
         .btn-reveal {
           background: var(--accent-color);
           color: white;
-          padding: 0.4rem 0.8rem;
+          padding: 0.4rem 1rem;
           border-radius: 20px;
           font-weight: bold;
           font-size: 0.8rem;
-          box-shadow: 0 0 15px var(--accent-glow);
+          width: auto; height: auto;
+          box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
         }
-        .btn-reveal:hover {
+        .btn-reveal:hover:not(:disabled) {
           transform: translateY(-1px);
-          box-shadow: 0 0 20px var(--accent-color);
+          box-shadow: 0 6px 8px rgba(37, 99, 235, 0.3);
+          background: var(--accent-color); color: white;
         }
       `}</style>
         </div>

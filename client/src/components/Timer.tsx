@@ -45,27 +45,36 @@ export const Timer: React.FC = () => {
 
             <style>{`
         .timer-container {
-          background: rgba(0,0,0,0.3);
-          padding: 0.3rem 0.8rem;
+          background: white;
+          padding: 0.4rem 1rem;
           border-radius: 8px;
           border: 1px solid var(--border-color);
           font-family: monospace;
           font-weight: bold;
+          box-shadow: var(--shadow-sm);
+          color: #1f2937;
         }
-        .timer-display { display: flex; align-items: center; gap: 0.5rem; font-size: 1.2rem; }
+        .timer-display { display: flex; align-items: center; gap: 0.8rem; font-size: 1.2rem; }
         .timer-display.urgent { color: var(--retro-red); animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         .timer-setup { display: flex; align-items: center; gap: 0.4rem; }
         .timer-setup input { 
           width: 40px; 
-          background: transparent; 
-          border: none; 
-          color: white; 
+          background: #f3f4f6; 
+          border: 1px solid var(--border-color);
+          border-radius: 4px;
+          color: #1f2937; 
           text-align: center;
           font-family: inherit;
           font-size: 1rem;
+          padding: 2px;
         }
-        .btn-icon { background: transparent; border: none; cursor: pointer; color: white; font-size: 1rem; }
+        .btn-icon { 
+            background: transparent; border: none; cursor: pointer; color: var(--text-secondary); font-size: 1.1rem; 
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%; transition: all 0.2s;
+        }
+        .btn-icon:hover { background: #f3f4f6; color: var(--accent-color); }
       `}</style>
         </div>
     );
