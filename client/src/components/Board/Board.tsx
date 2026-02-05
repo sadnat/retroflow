@@ -1831,17 +1831,18 @@ export const Board: React.FC = () => {
         }
         .column-header h3 { margin: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); font-weight: 600; }
         .btn-add {
-          background: transparent;
+          background: white;
           border: 1px solid var(--border-color);
           color: var(--text-secondary);
-          width: 32px; height: 32px;
+          width: 36px; height: 36px;
           border-radius: 50%;
           cursor: pointer;
-          font-size: 1.2rem;
+          font-size: 1.4rem;
           display: flex; align-items: center; justify-content: center;
           transition: all 0.2s;
+          box-shadow: var(--shadow-sm);
         }
-        .btn-add:hover { background: var(--accent-color); color: white; border-color: var(--accent-color); }
+        .btn-add:hover { background: var(--accent-color); color: white; border-color: var(--accent-color); box-shadow: var(--shadow-md); transform: translateY(-1px); }
         .column-content {
           flex: 1;
           padding: 1rem;
@@ -2548,9 +2549,10 @@ export const Board: React.FC = () => {
           border: none;
           color: #9ca3af;
           cursor: pointer;
-          font-size: 1.2rem;
-          padding: 0 0.3rem;
+          font-size: 1.4rem;
+          padding: 0 0.5rem;
           transition: color 0.2s;
+          display: flex; align-items: center;
         }
 
         .action-item-row .btn-del:hover {
@@ -2596,11 +2598,12 @@ export const Board: React.FC = () => {
           background: var(--accent-color);
           border: none;
           color: white;
-          padding: 0.75rem 1.5rem;
+          padding: 0 1.5rem;
           border-radius: 8px;
           font-weight: 600;
           cursor: pointer;
           transition: background 0.2s;
+          display: flex; align-items: center; justify-content: center;
         }
 
         .btn-add-action:hover {
@@ -2868,15 +2871,17 @@ export const Board: React.FC = () => {
         .voting-revealed { font-weight: bold; display: flex; align-items: center; gap: 1rem; }
         .btn-tie-break {
           background: white; color: var(--accent-color); border: none;
-          padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;
+          padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;
           font-weight: bold; cursor: pointer; animation: pulse 2s infinite;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .topic-title-row { display: flex; align-items: center; gap: 1rem; }
-        .topic-voting-controls { display: flex; gap: 0.3rem; }
+        .topic-voting-controls { display: flex; gap: 0.5rem; }
         .topic-voting-controls button {
-          width: 24px; height: 24px; border-radius: 4px; border: 1px solid #d1d5db;
+          width: 28px; height: 28px; border-radius: 6px; border: 1px solid #d1d5db;
           background: white; color: var(--text-secondary); cursor: pointer; display: flex;
-          align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s;
+          align-items: center; justify-content: center; font-size: 1.1rem; transition: all 0.2s;
+          box-shadow: var(--shadow-sm);
         }
         .topic-voting-controls button:hover:not(:disabled) { background: var(--accent-color); color: white; border-color: var(--accent-color); }
         .topic-vote-count {

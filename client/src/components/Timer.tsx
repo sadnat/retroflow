@@ -46,15 +46,17 @@ export const Timer: React.FC = () => {
             <style>{`
         .timer-container {
           background: white;
-          padding: 0.4rem 1rem;
-          border-radius: 8px;
+          padding: 0.6rem 1.2rem;
+          border-radius: 12px;
           border: 1px solid var(--border-color);
           font-family: monospace;
           font-weight: bold;
           box-shadow: var(--shadow-sm);
           color: #1f2937;
+          display: flex;
+          align-items: center;
         }
-        .timer-display { display: flex; align-items: center; gap: 0.8rem; font-size: 1.2rem; }
+        .timer-display { display: flex; align-items: center; gap: 1rem; font-size: 1.2rem; }
         .timer-display.urgent { color: var(--retro-red); animation: pulse 1s infinite; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
         .timer-setup { display: flex; align-items: center; gap: 0.4rem; }

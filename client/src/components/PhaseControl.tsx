@@ -31,7 +31,7 @@ export const PhaseControl: React.FC = () => {
     return (
         <div className="phase-control-wrapper">
             <div className="phase-control">
-                <button onClick={handlePrev} disabled={currentIdx === 0} title="Phase précédente">←</button>
+                <button className="btn-prev" onClick={handlePrev} disabled={currentIdx === 0} title="Phase précédente">←</button>
 
                 <div className="current-phase-info">
                     <span className="phase-label">{t.phases[room.phase]}</span>
@@ -92,37 +92,51 @@ export const PhaseControl: React.FC = () => {
         .step-dot.active { background: var(--accent-color); opacity: 0.6; }
         .step-dot.current { opacity: 1; transform: scale(1.2); background: var(--accent-color); }
         
-        button {
+        .btn-prev {
           background: transparent;
           border: none;
           color: var(--text-primary);
           cursor: pointer;
-          font-size: 0.9rem;
+          font-size: 1.2rem;
           transition: all 0.2s;
           display: flex; align-items: center; justify-content: center;
-          width: 24px; height: 24px; border-radius: 50%;
+          width: 32px; height: 32px; border-radius: 50%;
         }
-        button:hover:not(:disabled) { background: #f3f4f6; color: var(--accent-color); }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-prev:hover:not(:disabled) { background: #f3f4f6; color: var(--accent-color); }
+        .btn-prev:disabled { opacity: 0.3; cursor: not-allowed; }
         
         .btn-next {
+          background: transparent;
+          border: 1px solid var(--border-color);
           font-weight: 600;
           color: var(--text-primary);
-          padding: 0.2rem 0.6rem;
-          border-radius: 12px;
-          width: auto; height: auto;
+          padding: 0.4rem 1rem;
+          border-radius: 20px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
         }
-        .btn-next:hover:not(:disabled) { color: var(--accent-color); background: #eff6ff; }
+        .btn-next:hover:not(:disabled) { 
+            color: var(--accent-color); 
+            background: #eff6ff; 
+            border-color: var(--accent-color);
+        }
+        .btn-next:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .btn-reveal {
           background: var(--accent-color);
           color: white;
-          padding: 0.4rem 1rem;
+          border: none;
+          padding: 0.5rem 1.2rem;
           border-radius: 20px;
           font-weight: bold;
-          font-size: 0.8rem;
-          width: auto; height: auto;
+          font-size: 0.9rem;
+          cursor: pointer;
           box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+          transition: all 0.2s;
         }
         .btn-reveal:hover:not(:disabled) {
           transform: translateY(-1px);
