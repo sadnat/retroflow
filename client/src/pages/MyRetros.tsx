@@ -211,7 +211,7 @@ export const MyRetrosPage: React.FC<MyRetrosPageProps> = ({ onBack, onJoinRoom }
                     right: 0;
                     bottom: 0;
                     padding: 2rem;
-                    background: var(--bg-primary);
+                    background: var(--bg-color);
                     overflow-y: auto;
                     overflow-x: hidden;
                     box-sizing: border-box;
@@ -224,43 +224,59 @@ export const MyRetrosPage: React.FC<MyRetrosPageProps> = ({ onBack, onJoinRoom }
                 .my-retros-header {
                     display: flex;
                     align-items: center;
-                    gap: 1rem;
+                    gap: 1.5rem;
                     margin-bottom: 2rem;
                 }
                 .my-retros-header h1 {
                     margin: 0;
                     flex: 1;
+                    color: #111827;
+                    font-size: 1.8rem;
                 }
                 .back-button {
-                    background: rgba(255,255,255,0.1);
+                    background: white;
                     border: 1px solid var(--border-color);
-                    color: white;
-                    padding: 0.5rem 1rem;
+                    color: var(--text-primary);
+                    padding: 0.6rem 1.2rem;
                     border-radius: 8px;
                     cursor: pointer;
+                    font-weight: 500;
+                    font-size: 0.95rem;
+                    transition: all 0.2s;
+                    box-shadow: var(--shadow-sm);
                 }
                 .back-button:hover {
-                    background: rgba(255,255,255,0.2);
+                    background: #f9fafb;
+                    border-color: #d1d5db;
+                    transform: translateY(-1px);
+                    box-shadow: var(--shadow-md);
                 }
                 .filter-tabs {
                     display: flex;
-                    gap: 0.5rem;
+                    gap: 0.8rem;
                     margin-bottom: 1.5rem;
                     flex-wrap: wrap;
                 }
                 .filter-tab {
-                    background: rgba(255,255,255,0.05);
+                    background: white;
                     border: 1px solid var(--border-color);
                     color: var(--text-secondary);
-                    padding: 0.5rem 1rem;
-                    border-radius: 8px;
+                    padding: 0.6rem 1.2rem;
+                    border-radius: 20px;
                     cursor: pointer;
                     font-size: 0.9rem;
+                    font-weight: 500;
+                    transition: all 0.2s;
+                }
+                .filter-tab:hover {
+                    border-color: #d1d5db;
+                    color: var(--text-primary);
                 }
                 .filter-tab.active {
                     background: var(--accent-color);
                     border-color: var(--accent-color);
                     color: white;
+                    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
                 }
                 .loading, .error, .empty-state {
                     text-align: center;
@@ -268,10 +284,11 @@ export const MyRetrosPage: React.FC<MyRetrosPageProps> = ({ onBack, onJoinRoom }
                     color: var(--text-secondary);
                 }
                 .error {
-                    color: #f44336;
+                    color: #ef4444;
                 }
                 .empty-state p {
-                    margin-bottom: 1rem;
+                    margin-bottom: 1.5rem;
+                    font-size: 1.1rem;
                 }
                 .rooms-list {
                     display: flex;
@@ -279,41 +296,45 @@ export const MyRetrosPage: React.FC<MyRetrosPageProps> = ({ onBack, onJoinRoom }
                     gap: 1rem;
                 }
                 .room-card {
-                    background: var(--panel-bg);
+                    background: white;
                     border: 1px solid var(--border-color);
                     border-radius: 12px;
-                    padding: 1.25rem;
+                    padding: 1.5rem;
                     cursor: pointer;
-                    transition: border-color 0.2s, transform 0.2s;
+                    transition: all 0.2s;
+                    box-shadow: var(--shadow-sm);
                 }
                 .room-card:hover {
                     border-color: var(--accent-color);
                     transform: translateY(-2px);
+                    box-shadow: var(--shadow-md);
                 }
                 .room-card-header {
                     display: flex;
                     justify-content: space-between;
                     align-items: flex-start;
-                    margin-bottom: 0.75rem;
+                    margin-bottom: 1rem;
                     gap: 1rem;
                 }
                 .room-card-header h3 {
                     margin: 0;
-                    font-size: 1.1rem;
+                    font-size: 1.2rem;
                     flex: 1;
+                    color: #111827;
+                    font-weight: 600;
                 }
                 .room-card-actions {
                     display: flex;
                     align-items: center;
-                    gap: 0.5rem;
+                    gap: 0.8rem;
                 }
                 .btn-delete-room {
-                    background: rgba(244, 67, 54, 0.1);
-                    border: 1px solid rgba(244, 67, 54, 0.3);
-                    color: #f44336;
-                    width: 28px;
-                    height: 28px;
-                    border-radius: 6px;
+                    background: white;
+                    border: 1px solid #fecaca;
+                    color: #ef4444;
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 8px;
                     cursor: pointer;
                     font-size: 1.2rem;
                     display: flex;
@@ -323,7 +344,8 @@ export const MyRetrosPage: React.FC<MyRetrosPageProps> = ({ onBack, onJoinRoom }
                     transition: all 0.2s;
                 }
                 .btn-delete-room:hover {
-                    background: rgba(244, 67, 54, 0.3);
+                    background: #fef2f2;
+                    border-color: #ef4444;
                 }
                 .confirm-delete {
                     display: flex;
@@ -332,71 +354,91 @@ export const MyRetrosPage: React.FC<MyRetrosPageProps> = ({ onBack, onJoinRoom }
                     font-size: 0.85rem;
                 }
                 .confirm-delete span {
-                    color: #f44336;
+                    color: #ef4444;
+                    font-weight: 600;
                 }
                 .btn-confirm-yes, .btn-confirm-no {
-                    padding: 0.25rem 0.5rem;
-                    border-radius: 4px;
+                    padding: 0.3rem 0.8rem;
+                    border-radius: 6px;
                     cursor: pointer;
                     font-size: 0.8rem;
-                    border: none;
+                    font-weight: 600;
+                    border: 1px solid transparent;
                 }
                 .btn-confirm-yes {
-                    background: #f44336;
+                    background: #ef4444;
                     color: white;
                 }
                 .btn-confirm-yes:disabled {
                     opacity: 0.5;
                 }
                 .btn-confirm-no {
-                    background: rgba(255,255,255,0.1);
-                    color: white;
+                    background: white;
+                    border-color: #d1d5db;
+                    color: #374151;
                 }
                 .status-badge {
                     padding: 0.2rem 0.6rem;
                     border-radius: 4px;
                     font-size: 0.75rem;
-                    font-weight: 500;
+                    font-weight: 700;
                     white-space: nowrap;
+                    text-transform: uppercase;
                 }
                 .status-badge.active {
-                    background: rgba(76, 175, 80, 0.2);
-                    color: #4caf50;
+                    background: #ecfdf5;
+                    color: #059669;
+                    border: 1px solid #a7f3d0;
                 }
                 .status-badge.closed {
-                    background: rgba(158, 158, 158, 0.2);
-                    color: #9e9e9e;
+                    background: #f3f4f6;
+                    color: #6b7280;
+                    border: 1px solid #e5e7eb;
                 }
                 .status-badge.archived {
-                    background: rgba(255, 152, 0, 0.2);
-                    color: #ff9800;
+                    background: #fff7ed;
+                    color: #ea580c;
+                    border: 1px solid #fed7aa;
                 }
                 .room-card-meta {
                     display: flex;
                     gap: 0.5rem;
-                    margin-bottom: 0.75rem;
+                    margin-bottom: 1rem;
                 }
                 .template-badge, .phase-badge {
-                    padding: 0.2rem 0.5rem;
-                    background: rgba(255,255,255,0.1);
-                    border-radius: 4px;
+                    padding: 0.2rem 0.6rem;
+                    background: #f3f4f6;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 6px;
                     font-size: 0.75rem;
+                    font-weight: 600;
                     text-transform: uppercase;
+                    color: #4b5563;
                 }
                 .room-card-stats {
                     display: flex;
                     justify-content: space-between;
                     font-size: 0.85rem;
                     color: var(--text-secondary);
+                    border-top: 1px solid #f3f4f6;
+                    padding-top: 0.8rem;
                 }
                 .btn-primary {
-                    padding: 0.75rem 1.5rem;
+                    padding: 0.8rem 1.5rem;
                     background: var(--accent-color);
                     border: none;
                     border-radius: 8px;
                     color: white;
                     font-size: 1rem;
+                    font-weight: 600;
                     cursor: pointer;
+                    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+                    transition: all 0.2s;
+                }
+                .btn-primary:hover {
+                    background: #1d4ed8;
+                    transform: translateY(-1px);
+                    box-shadow: 0 6px 8px rgba(37, 99, 235, 0.3);
                 }
             `}</style>
         </div>
