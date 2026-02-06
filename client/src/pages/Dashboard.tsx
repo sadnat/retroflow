@@ -63,7 +63,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onShowMyRetros }) => {
                 </div>
             )}
 
-            <div className="dashboard-container glass">
+            <div className="dashboard-container">
                 <h1>{t.app.title}</h1>
                 <p className="subtitle">{t.app.subtitle}</p>
 
@@ -182,6 +182,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onShowMyRetros }) => {
           align-items: center;
           justify-content: center;
           padding: 2rem;
+          background: var(--bg-color);
         }
         .dashboard-header {
           position: fixed;
@@ -192,44 +193,71 @@ export const Dashboard: React.FC<DashboardProps> = ({ onShowMyRetros }) => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: var(--panel-bg);
+          background: white;
           border-bottom: 1px solid var(--border-color);
+          box-shadow: var(--shadow-sm);
+          z-index: 10;
         }
         .header-actions {
           display: flex;
           gap: 1rem;
         }
-        .btn-secondary, .btn-logout {
-          background: rgba(255,255,255,0.1);
+        .btn-secondary {
+          background: white;
           border: 1px solid var(--border-color);
-          color: white;
+          color: var(--text-primary);
           padding: 0.5rem 1rem;
-          border-radius: 6px;
+          border-radius: 8px;
           cursor: pointer;
           font-size: 0.9rem;
+          font-weight: 500;
+          transition: all 0.2s;
+          box-shadow: var(--shadow-sm);
         }
-        .btn-secondary:hover, .btn-logout:hover {
-          background: rgba(255,255,255,0.2);
+        .btn-logout {
+          background: white;
+          border: 1px solid #fecaca;
+          color: #ef4444;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-weight: 500;
+          transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+          border-color: var(--accent-color);
+          color: var(--accent-color);
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-md);
+        }
+        .btn-logout:hover {
+          background: #fef2f2;
+          border-color: #ef4444;
         }
         .dashboard-container {
           padding: 3rem;
-          border-radius: 20px;
+          border-radius: 16px;
           width: 100%;
           max-width: 500px;
           text-align: left;
+          background: white;
+          border: 1px solid var(--border-color);
+          box-shadow: var(--shadow-lg);
         }
+        .dashboard-container h1 { margin-top: 0; color: #111827; }
         .subtitle {
           color: var(--text-secondary);
           margin-bottom: 2rem;
         }
         .guest-warning {
           padding: 1rem;
-          background: rgba(255, 152, 0, 0.1);
-          border: 1px solid rgba(255, 152, 0, 0.3);
+          background: #fff7ed;
+          border: 1px solid #fed7aa;
           border-radius: 8px;
           margin-bottom: 1.5rem;
           font-size: 0.9rem;
-          color: #ff9800;
+          color: #c2410c;
         }
         .create-form {
           display: flex;
@@ -244,15 +272,21 @@ export const Dashboard: React.FC<DashboardProps> = ({ onShowMyRetros }) => {
         label {
           font-weight: 600;
           font-size: 0.9rem;
-          color: var(--text-secondary);
+          color: #374151;
         }
         input, select {
           padding: 0.8rem;
-          background: rgba(255,255,255,0.05);
+          background: white;
           border: 1px solid var(--border-color);
           border-radius: 8px;
-          color: white;
+          color: #1f2937;
           font-size: 1rem;
+          transition: all 0.2s;
+        }
+        input:focus, select:focus {
+          outline: none;
+          border-color: var(--accent-color);
+          box-shadow: 0 0 0 3px var(--accent-glow);
         }
         select {
           cursor: pointer;
@@ -268,18 +302,23 @@ export const Dashboard: React.FC<DashboardProps> = ({ onShowMyRetros }) => {
         }
         .template-card {
           padding: 1rem;
-          background: rgba(255,255,255,0.03);
+          background: #f9fafb;
           border: 1px solid var(--border-color);
           border-radius: 10px;
           cursor: pointer;
           transition: all 0.2s;
         }
-        .template-card:hover { border-color: var(--accent-color); }
+        .template-card:hover { 
+            border-color: var(--accent-color); 
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
         .template-card.selected {
           border-color: var(--accent-color);
-          background: rgba(47, 129, 247, 0.1);
+          background: #eff6ff;
+          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
         }
-        .template-card h3 { margin: 0; font-size: 1rem; }
+        .template-card h3 { margin: 0; font-size: 1rem; font-weight: 600; color: #1f2937; }
         .template-card p { margin: 0.5rem 0 0; font-size: 0.8rem; color: var(--text-secondary); }
         
         .btn-advanced {
@@ -290,6 +329,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onShowMyRetros }) => {
           font-size: 0.9rem;
           text-align: left;
           padding: 0;
+          font-weight: 500;
         }
         .btn-advanced:hover {
           text-decoration: underline;
@@ -299,7 +339,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onShowMyRetros }) => {
           flex-direction: column;
           gap: 1rem;
           padding: 1rem;
-          background: rgba(255,255,255,0.02);
+          background: #f9fafb;
           border-radius: 8px;
           border: 1px solid var(--border-color);
         }
@@ -310,10 +350,17 @@ export const Dashboard: React.FC<DashboardProps> = ({ onShowMyRetros }) => {
           border: none;
           padding: 1rem;
           border-radius: 8px;
-          font-weight: bold;
+          font-weight: 600;
           font-size: 1rem;
           cursor: pointer;
           margin-top: 1rem;
+          transition: background 0.2s;
+          box-shadow: var(--shadow-sm);
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
         }
         .btn-primary:disabled { 
           opacity: 0.5; 
@@ -328,15 +375,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onShowMyRetros }) => {
         }
         .login-hint a {
           color: var(--accent-color);
+          font-weight: 500;
+          text-decoration: none;
         }
+        .login-hint a:hover { text-decoration: underline; }
         
-        .glass {
-          background: var(--panel-bg);
-          backdrop-filter: var(--glass-blur);
-          border: 1px solid var(--glass-border);
-          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        }
-        .error-message { color: var(--retro-red); font-size: 0.8rem; }
+        .error-message { color: var(--retro-red); font-size: 0.9rem; }
       `}</style>
         </div>
     );

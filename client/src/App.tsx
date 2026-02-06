@@ -357,9 +357,19 @@ function AppContent() {
                 transform: translateY(-1px);
                 box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
             }
-            .btn-participants:hover, .btn-logout:hover {
+            .btn-participants:hover {
                 background: #f9fafb;
                 border-color: #d1d5db;
+            }
+            
+            .btn-logout {
+                color: #ef4444;
+                border-color: #fecaca;
+                background: white;
+            }
+            .btn-logout:hover {
+                background: #fef2f2;
+                border-color: #ef4444;
             }
             
             .btn-delete {
